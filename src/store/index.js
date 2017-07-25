@@ -28,7 +28,7 @@ const actions = {
 		}catch(err){
 			console.log('您尚未登陆或者session失效')
 		}
-	}
+	},
 }
 
 export default new Vuex.Store({

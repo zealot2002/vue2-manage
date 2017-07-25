@@ -7,6 +7,13 @@ import fetch from '@/config/fetch'
 export const login = data => fetch('/admin/login', data, 'POST');
 
 /**
+ * 获取upload token
+ */
+
+export const getUploadToken = data => fetch('/base/getUploadToken', data, 'POST');
+
+
+/**
  * 退出
  */
 

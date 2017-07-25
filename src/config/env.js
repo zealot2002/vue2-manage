@@ -6,15 +6,15 @@
  * baseImgPath: 图片存放地址
  *
  */
-let baseUrl = '';
+let baseUrl = 'http://localhost:8080';
 let routerMode = 'history';
 let baseImgPath = 'http://images.cangdu.org/';
 
-if (process.env.NODE_ENV == 'development') {
-	//baseUrl = 'http://cangdu.org:8001';
-}else{
-	baseUrl = 'http://localhost:8080/';
-}
+// if (process.env.NODE_ENV == 'development') {
+// 	//baseUrl = 'http://cangdu.org:8001';
+// }else{
+// 	baseUrl = 'http://localhost:8080';
+// }
 
 export {
 	baseUrl,

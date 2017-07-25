@@ -54,16 +54,13 @@
 				this.$refs[formName].validate(async (valid) => {
 					if (valid) {
 						const res = await login({username: this.loginForm.username, password: this.loginForm.password})
-
             if (res.code == 200) {
-              alert("success 1");
 							this.$message({
 		                        type: 'success',
 		                        message: '登录成功'
 		                    });
 							this.$router.push('manage')
 						}else{
-              alert("error 1");
 							this.$message({
 		                        type: 'error',
 		                        message: res.message

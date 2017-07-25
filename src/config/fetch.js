@@ -4,6 +4,8 @@ export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
 	type = type.toUpperCase();
 	url = baseUrl + url;
 
+	console.log("fetch async url:"+url);
+
 	if (type == 'GET') {
 		let dataStr = ''; //数据拼接字符串
 		Object.keys(data).forEach(key => {
@@ -22,22 +24,30 @@ export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
 			method: type,
 			headers: {
 				'Accept': 'application/json',
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				"Access-Control-Allow-Origin" : "*",
+				"Access-Control-Allow-Credentials" : true
 			},
 			mode: "cors",
 			cache: "force-cache"
 		}
 
+		console.log("fetch async 2");
+
 		if (type == 'POST') {
-			Object.defineProperty(requestConfig, 'body', {
+				Object.defineProperty(requestConfig, 'body', {
 				value: JSON.stringify(data)
 			})
 		}
 
 		try {
+			console.log("fetch async 3");
 
 			const response = await fetch(url, requestConfig);
+			console.log("fetch async 4 response:"+response);
+
 			const responseJson = await response.json();
+			console.log("fetch async 5 responseJson:"+responseJson);
 
 			return responseJson
 		} catch (error) {
