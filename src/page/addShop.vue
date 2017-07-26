@@ -9,7 +9,7 @@
 					</el-form-item>
 
 					<el-form-item label="详细地址" prop="address">
-						<el-input v-model="formData.name"></el-input>
+						<el-input v-model="formData.address"></el-input>
 					</el-form-item>
 
 					<el-form-item label="联系电话" prop="phone">
@@ -21,7 +21,6 @@
 					<el-form-item label="上传店铺头像">
 						<el-upload
 						  class="avatar-uploader"
-						  :action="baseUrl + '/v1/addimg/shop'"
 						  :show-file-list="false"
 						  :on-success="handleShopAvatarScucess"
 						  :before-upload="beforeAvatarUpload">
@@ -32,7 +31,6 @@
 					<el-form-item label="上传营业执照">
 						<el-upload
 						  class="avatar-uploader"
-						  :action="baseUrl + '/v1/addimg/shop'"
 						  :show-file-list="false"
 						  :on-success="handleBusinessAvatarScucess"
 						  :before-upload="beforeAvatarUpload">
@@ -77,7 +75,6 @@
     					],
     					phone: [
     						{ required: true, message: '请输入联系电话' },
-    						{ type: 'number', message: '电话号码必须是数字' }
     					],
 	          },
 			    baseUrl,
@@ -98,12 +95,9 @@
   		},
     	methods: {
         async initData(){
-
           Promise.all([getUploadToken()])
           .then(res => {
-            console.log("back");
             this.uploadToken = res[0].data;
-            console.log("this.uploadToken:"+this.uploadToken);
           }).catch(err => {
             console.log(err)
           })
@@ -156,44 +150,19 @@
 		    submitForm(formName) {
 				this.$refs[formName].validate(async (valid) => {
 					if (valid) {
-						Object.assign(this.formData, {activities: this.activities}, {
-							category: this.selectedCategory.join('/')
-						})
 						try{
 							let result = await addShop(this.formData);
-							if (result.status == 1) {
+							if (result.code == 200) {
 								this.$message({
 					            	type: 'success',
 					            	message: '添加成功'
 					          	});
-					          	this.formData = {
-									name: '', //店铺名称
-									address: '', //地址
-									latitude: '',
-									longitude: '',
-									description: '', //介绍
-									phone: '',
-									promotion_info: '',
-									float_delivery_fee: 5, //运费
-									float_minimum_order_amount: 20, //起价
-									is_premium: true,
-									delivery_mode: true,
-									new: true,
-									bao: true,
-									zhun: true,
-									piao: true,
-									startTime: '',
-				       	 			endTime: '',
-				       	 			image_path: '',
-				       	 			business_license_image: '',
-				       	 			catering_service_license_image: '',
-						        };
-						        this.selectedCategory = ['快餐便当', '简餐'];
-						        this.activities = [{
-						        	icon_name: '减',
-						        	name: '满减优惠',
-						        	description: '满30减5，满60减8',
-							    }];
+		          	this.formData = {
+  									name: '', //店铺名称
+  									address: '', //地址
+  									description: '', //介绍
+  									phone: '',
+                  }
 							}else{
 								this.$message({
 					            	type: 'error',

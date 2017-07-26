@@ -31,9 +31,6 @@ export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
 			mode: "cors",
 			cache: "force-cache"
 		}
-
-		console.log("fetch async 2");
-
 		if (type == 'POST') {
 				Object.defineProperty(requestConfig, 'body', {
 				value: JSON.stringify(data)
@@ -41,14 +38,8 @@ export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
 		}
 
 		try {
-			console.log("fetch async 3");
-
 			const response = await fetch(url, requestConfig);
-			console.log("fetch async 4 response:"+response);
-
 			const responseJson = await response.json();
-			console.log("fetch async 5 responseJson:"+responseJson);
-
 			return responseJson
 		} catch (error) {
 			throw new Error(error)

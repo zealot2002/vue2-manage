@@ -87,7 +87,7 @@ export const cityGuess = () => fetch('/v1/cities', {
  * 添加商铺
  */
 
-export const addShop = data => fetch('/shopping/addShop', data, 'POST');
+export const addShop = data => fetch('/shop/add', data, 'POST');
 
 /**
  * 获取搜索地址
@@ -129,7 +129,7 @@ export const foodCategory = (latitude, longitude) => fetch('/shopping/v2/restaur
  * 获取餐馆列表
  */
 
-export const getResturants = data => fetch('/shopping/restaurants', data);
+export const getShopList = data => fetch('/shop/list', data,'POST');
 
 /**
  * 获取餐馆详细信息
@@ -141,19 +141,19 @@ export const getResturantDetail = restaurant_id => fetch('/shopping/restaurant/'
  * 获取餐馆数量
  */
 
-export const getResturantsCount = () => fetch('/shopping/restaurants/count');
+export const getShopCount = () => fetch('/shop/count');
 
 /**
  * 更新餐馆信息
  */
 
-export const updateResturant = data => fetch('/shopping/updateshop', data, 'POST');
+export const updateShop = data => fetch('/shop/update', data, 'POST');
 
 /**
  * 删除餐馆
  */
 
-export const deleteResturant = restaurant_id => fetch('/shopping/restaurant/' + restaurant_id, {}, 'DELETE');
+export const deleteShop = shop_id => fetch('/shop/delete/',shop_id, 'POST');
 
 /**
  * 获取食品列表
