@@ -6,7 +6,7 @@
  * baseImgPath: 图片存放地址
  *
  */
-let baseUrl = 'http://localhost:8080';
+let baseUrl = 'http://localhost:8004';
 let routerMode = 'history';
 let baseImgPath = 'http://images.cangdu.org/';
 

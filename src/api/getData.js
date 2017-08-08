@@ -109,7 +109,7 @@ export const getCategory = restaurant_id => fetch('/shopping/getcategory/' + res
  * 添加食品种类
  */
 
-export const addCategory = data => fetch('/shopping/addcategory', data, 'POST');
+// export const addCategory = data => fetch('/shopping/addcategory', data, 'POST');
 
 
 /**
@@ -129,7 +129,11 @@ export const foodCategory = (latitude, longitude) => fetch('/shopping/v2/restaur
  * 获取餐馆列表
  */
 
-export const getShopList = data => fetch('/shop/list', data,'POST');
+// export const getDishList = data => fetch('/dish/list', data,'POST');
+
+
+
+
 
 /**
  * 获取餐馆详细信息
@@ -233,3 +237,50 @@ export const getAddressById = address_id => fetch('/v1/addresse/' + address_id);
  */
 
 export const getUserCity = () => fetch('/v1/user/city/count');
+
+
+
+/***********************************************************************************/
+/**
+ * 桌台
+ */
+export const getDeskList = data => fetch('/desk/list', data,'POST');
+export const addDesk = data => fetch('/desk/add', data,'POST');
+export const updateDesk = data => fetch('/desk/update', data,'POST');
+export const deleteDesk = data => fetch('/desk/delete', data,'POST');
+
+/**
+ * 分类
+ */
+
+export const getCategoryList = data => fetch('/category/list', data,'POST');
+export const addCategory = data => fetch('/category/add', data,'POST');
+export const updateCategory = data => fetch('/category/update', data,'POST');
+export const deleteCategory = data => fetch('/category/delete', data,'POST');
+
+/**
+ * 标签
+ */
+
+export const getTagList = data => fetch('/tag/list', data,'POST');
+export const addTag = data => fetch('/tag/add', data,'POST');
+export const updateTag = data => fetch('/tag/update', data,'POST');
+export const deleteTag = data => fetch('/tag/delete', data,'POST');
+
+/**
+ * 菜品
+ */
+
+export const getDishList = data => fetch('/dish/list', data,'POST');
+export const addDish = data => fetch('/dish/add', data,'POST');
+export const updateDish = data => fetch('/dish/update', data,'POST');
+export const deleteDish = data => fetch('/dish/delete', data,'POST');
+
+/**
+ * 订单
+ */
+
+export const getEntList = data => fetch('/ent/list', data,'POST');
+export const addEnt = data => fetch('/ent/add', data,'POST');
+export const updateEnt = data => fetch('/ent/update', data,'POST');
+export const deleteEnt = data => fetch('/ent/delete', data,'POST');

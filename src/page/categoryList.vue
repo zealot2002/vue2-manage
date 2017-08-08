@@ -2,51 +2,41 @@
     <div class="fillcontain">
         <head-top></head-top>
         <div class="table_container">
+          <el-button
+            size="mini"
+            type="info"
+            style="float:right"
+            @click="handleAdd()">增加分类</el-button>
+            <br/><br/>
             <el-table
                 :data="tableData"
                 style="width: 100%">
                 <el-table-column type="expand">
                   <template scope="props">
                     <el-form label-position="left" inline class="demo-table-expand">
-                      <el-form-item label="商铺名称">
-                        <span>{{ props.row.name }}</span>
-                      </el-form-item>
-                      <el-form-item label="商铺地址">
-                        <span>{{ props.row.address }}</span>
-                      </el-form-item>
-                      <el-form-item label="商铺介绍">
-                        <span>{{ props.row.description }}</span>
-                      </el-form-item>
-                      <el-form-item label="商铺 ID">
+                      <el-form-item label="ID">
                         <span>{{ props.row.id }}</span>
                       </el-form-item>
-                      <el-form-item label="联系电话">
-                        <span>{{ props.row.phone }}</span>
+                      <el-form-item label="名称">
+                        <span>{{ props.row.name }}</span>
                       </el-form-item>
                     </el-form>
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="商铺名称"
+                  label="ID"
+                  prop="id">
+                </el-table-column>
+                <el-table-column
+                  label="名称"
                   prop="name">
-                </el-table-column>
-                <el-table-column
-                  label="商铺地址"
-                  prop="address">
-                </el-table-column>
-                <el-table-column
-                  label="商铺介绍"
-                  prop="description">
                 </el-table-column>
                 <el-table-column label="操作" width="200">
                   <template scope="scope">
                     <el-button
                       size="mini"
                       @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                    <el-button
-                      size="mini"
-                      type="Success"
-                      @click="addCommodity(scope.$index, scope.row)">添加商品</el-button>
+
                     <el-button
                       size="mini"
                       type="danger"
@@ -59,29 +49,32 @@
                   @size-change="handleSizeChange"
                   @current-change="handleCurrentChange"
                   :current-page="currentPage"
-                  :page-size="20"
+                  :page-size="15"
                   layout="total, prev, pager, next"
                   :total="count">
                 </el-pagination>
             </div>
-            <el-dialog title="修改商铺信息" v-model="dialogFormVisible">
+            <el-dialog title="修改信息" v-model="editDialogFormVisible">
                 <el-form :model="selectTable">
-                    <el-form-item label="商铺名称" label-width="100px">
+                    <el-form-item label="名称" label-width="100px">
                         <el-input v-model="selectTable.name" auto-complete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="详细地址" label-width="100px">
-                        <el-input v-model="selectTable.address" auto-complete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="商铺介绍" label-width="100px">
-                        <el-input v-model="selectTable.description"></el-input>
-                    </el-form-item>
-                    <el-form-item label="联系电话" label-width="100px">
-                        <el-input v-model="selectTable.phone"></el-input>
+
+                </el-form>
+              <div slot="footer" class="dialog-footer">
+                <el-button @click="editDialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="update">确 定</el-button>
+              </div>
+            </el-dialog>
+            <el-dialog title="增加分类" v-model="addDialogFormVisible">
+                <el-form :model="selectTable">
+                    <el-form-item label="名称" label-width="100px">
+                        <el-input v-model="selectTable.name" auto-complete="off"></el-input>
                     </el-form-item>
                 </el-form>
               <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="updateShop">确 定</el-button>
+                <el-button @click="addDialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="add">确 定</el-button>
               </div>
             </el-dialog>
         </div>
@@ -91,19 +84,20 @@
 <script>
     import headTop from '../components/headTop'
     import {baseUrl, baseImgPath} from '@/config/env'
-    import {getShopList, getShopCount,updateShop, deleteShop} from '@/api/getData'
+    import {getCategoryList,addCategory,updateCategory, deleteCategory} from '@/api/getData'
     export default {
         data(){
             return {
                 baseUrl,
                 baseImgPath,
                 pageNum: 1,
-                pageSize: 20,
+                pageSize: 15,
                 count: 0,
                 tableData: [],
                 currentPage: 1,
-                selectTable: {},
-                dialogFormVisible: false,
+                selectTable:{},
+                editDialogFormVisible: false,
+                addDialogFormVisible:false,
                 address: {},
             }
         },
@@ -115,37 +109,27 @@
     	},
         methods: {
             async initData(){
-                try{
-                    const res = await getShopCount();
-                    if (res.code == 200) {
-                        this.count = res.data;
-                        console.log(" this.count :"+this.count);
-                    }else{
-                        throw new Error('获取数据失败');
-                    }
-                    this.getShopList();
-                }catch(err){
-                    console.log('获取数据失败', err);
-                }
+                this.getList();
             },
-            async getShopList(){
-                const res = await getShopList({pageNum: this.pageNum, pageSize: this.pageSize});
+            async getList(){
+              try{
+                const res = await getCategoryList({pageNumber: this.pageNum, pageSize: this.pageSize});
                 this.tableData = [];
                 if(res.code == 200){
-                  res.data.list.forEach(item => {
+                  console.log("200");
+                  this.count = res.data.totalElements;
+                  res.data.content.forEach(item => {
                       const tableData = {};
-                      tableData.name = item.name;
-                      tableData.address = item.address;
-                      tableData.description = item.description;
-                      tableData.phone = item.phone;
-
-                      console.log("item.id ="+item.id);
                       tableData.id = item.id;
+                      tableData.name = item.name;
                       this.tableData.push(tableData);
                   })
                 }else{
-                  console.log("获取shopList失败");
+                  console.log("获取失败");
                 }
+              }catch(err){
+                  console.log('获取数据失败', err);
+              }
             },
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
@@ -154,24 +138,23 @@
                 console.log(`handleCurrentChange  ${val} `);
                 this.currentPage = val;
                 this.pageNum = val;
-                this.getShopList()
+                this.getList()
             },
             handleEdit(index, row) {
                 this.selectTable = row;
-                console.log("this.selectTable.id ="+this.selectTable.id);
-                this.address.address = row.address;
-                this.dialogFormVisible = true;
+                this.editDialogFormVisible = true;
             },
-            addCommodity(index, row){
-                this.$router.push({ path: 'addGoods', query: { restaurant_id: row.id }})
+            handleAdd(){
+              this.selectTable = {};
+              this.addDialogFormVisible = true;
             },
             async handleDelete(index, row) {
                 try{
-                    const res = await deleteShop(row.id);
+                    const res = await deleteCategory(row.id);
                     if (res.code == 200) {
                         this.$message({
                             type: 'success',
-                            message: '删除店铺成功'
+                            message: '删除成功'
                         });
                         this.tableData.splice(index, 1);
                     }else{
@@ -182,39 +165,19 @@
                         type: 'error',
                         message: err.message
                     });
-                    console.log('删除店铺失败')
+                    console.log('删除失败')
                 }
             },
-            handleServiceAvatarScucess(res, file) {
-                if (res.status == 1) {
-                    this.selectTable.image_path = res.image_path;
-                }else{
-                    this.$message.error('上传图片失败！');
-                }
-            },
-            beforeAvatarUpload(file) {
-                const isRightType = (file.type === 'image/jpeg') || (file.type === 'image/png');
-                const isLt2M = file.size / 1024 / 1024 < 2;
-
-                if (!isRightType) {
-                    this.$message.error('上传头像图片只能是 JPG 格式!');
-                }
-                if (!isLt2M) {
-                    this.$message.error('上传头像图片大小不能超过 2MB!');
-                }
-                return isRightType && isLt2M;
-            },
-            async updateShop(){
-                this.dialogFormVisible = false;
+            async update(){
+                this.editDialogFormVisible = false;
                 try{
-                    console.log("updateShop this.selectTable.id="+this.selectTable.id);
-                    const res = await updateShop(this.selectTable)
+                    const res = await updateCategory(this.selectTable)
                     if (res.code == 200) {
                         this.$message({
                             type: 'success',
-                            message: '更新店铺信息成功'
+                            message: '更新成功'
                         });
-                        this.getShopList();
+                        this.getList();
                     }else{
                         this.$message({
                             type: 'error',
@@ -222,7 +185,27 @@
                         });
                     }
                 }catch(err){
-                    console.log('更新餐馆信息失败', err);
+                    console.log('更新失败', err);
+                }
+            },
+            async add(){
+                this.addDialogFormVisible = false;
+                try{
+                    const res = await addCategory(this.selectTable)
+                    if (res.code == 200) {
+                        this.$message({
+                            type: 'success',
+                            message: '新增成功'
+                        });
+                        this.getList();
+                    }else{
+                        this.$message({
+                            type: 'error',
+                            message: res.message
+                        });
+                    }
+                }catch(err){
+                    console.log('新增失败', err);
                 }
             },
         },
