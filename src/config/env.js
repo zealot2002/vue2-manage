@@ -8,7 +8,7 @@
  */
 let baseUrl = 'http://localhost:8004';
 let routerMode = 'history';
-let baseImgPath = 'http://images.cangdu.org/';
+let baseImgPath = 'http://localhost:8004/files';
 
 // if (process.env.NODE_ENV == 'development') {
 // 	//baseUrl = 'http://cangdu.org:8001';

@@ -8,33 +8,47 @@
                 <el-table-column type="expand">
                   <template scope="props">
                     <el-form label-position="left" inline class="demo-table-expand">
-                      <el-form-item label="ID">
-                        <span>{{ props.row.id }}</span>
+                      <el-form-item label="菜品列表">
+                        <li v-for="dish of props.row.dishList">
+                          {{ dish.name }}   {{ dish.price }}  
+                        </li>
                       </el-form-item>
-                      <el-form-item label="名称">
-                        <span>{{ props.row.name }}</span>
+
+                      <el-form-item
+                        label="处理时间"
+                        prop="startTime">
                       </el-form-item>
-                      <el-form-item label="描述">
-                        <span>{{ props.row.description }}</span>
+                      <el-form-item
+                        label="完成时间"
+                        prop="endTime">
                       </el-form-item>
+                      <el-form-item
+                        label="支付时间"
+                        prop="chargedTime">
+                      </el-form-item>
+
                     </el-form>
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="名称"
-                  prop="name">
+                  label="编号"
+                  prop="id">
                 </el-table-column>
-                <el-table-column label="操作" width="200">
-                  <template scope="scope">
-                    <el-button
-                      size="mini"
-                      @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-
-                    <el-button
-                      size="mini"
-                      type="danger"
-                      @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                  </template>
+                <el-table-column
+                  label="桌台"
+                  prop="desk">
+                </el-table-column>
+                <el-table-column
+                  label="下单时间"
+                  prop="createTime">
+                </el-table-column>
+                <el-table-column
+                  label="价格"
+                  prop="price">
+                </el-table-column>
+                <el-table-column
+                  label="状态"
+                  prop="status">
                 </el-table-column>
             </el-table>
             <div class="Pagination">
@@ -83,7 +97,6 @@
                 selectTable: {},
                 editDialogFormVisible: false,
                 addDialogFormVisible:false,
-                address: {},
             }
         },
         created(){
@@ -93,6 +106,11 @@
     		headTop,
     	},
         methods: {
+            toLocaleString(timestamp){
+                var newDate = new Date();
+                newDate.setTime(timestamp);
+                return newDate.toLocaleString();
+            },
             async initData(){
                 this.getList();
             },
@@ -103,12 +121,23 @@
                 if(res.code == 200){
                   console.log("200");
                   this.count = res.data.totalElements;
-                  console.log(this.count);
                   res.data.content.forEach(item => {
                       const tableData = {};
                       tableData.id = item.id;
-                      tableData.name = item.name;
-                      tableData.description = item.description;
+                      tableData.desk = item.desk.name;
+                      tableData.status = item.status;
+                      tableData.dishList = item.dishList;
+                      tableData.price = item.price;
+
+                      if(item.createTime>0)
+                        tableData.createTime = this.toLocaleString(item.createTime);
+                      if(item.startTime>0)
+                        tableData.startTime = this.toLocaleString(item.startTime);
+                      if(item.endTime>0)
+                        tableData.endTime = this.toLocaleString(item.endTime);
+                      if(item.chargedTime>0)
+                        tableData.chargedTime = this.toLocaleString(item.chargedTime);
+
                       this.tableData.push(tableData);
                   })
                 }else{

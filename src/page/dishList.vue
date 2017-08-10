@@ -81,11 +81,35 @@
                       </el-option>
                     </el-select>
                   </el-form-item>
+
+                  <el-form-item label="标签" label-width="100px">
+                    <el-select v-model="selectedTagList" multiple placeholder="请选择">
+                        <el-option
+                            v-for="item in tagList"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id">
+                        </el-option>
+                    </el-select>
+                  </el-form-item>
+
                     <el-form-item label="名称" label-width="100px">
                         <el-input v-model="selectTable.name" auto-complete="off"></el-input>
                     </el-form-item>
                     <el-form-item label="价格" label-width="100px">
                         <el-input v-model="selectTable.price" auto-complete="off"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="图片" label-width="100px">
+                      <el-upload
+                        class="avatar-uploader"
+                        :action="baseUrl + '/uploadFile'"
+                        :show-file-list="false"
+                        :on-success="handleAvatarSuccess"
+                        :before-upload="beforeAvatarUpload">
+                        <img v-if="file" :src="baseImgPath+'/'+selectTable.cover" class="avatar">
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                      </el-upload>
                     </el-form-item>
                 </el-form>
               <div slot="footer" class="dialog-footer">
@@ -105,7 +129,7 @@
                         </el-option>
                       </el-select>
                     </el-form-item>
-                    <el-form-item label="特点" label-width="100px">
+                    <el-form-item label="标签" label-width="100px">
           						<el-select v-model="selectedTagList" multiple placeholder="请选择">
           						    <el-option
           						      	v-for="item in tagList"
@@ -120,6 +144,18 @@
                     </el-form-item>
                     <el-form-item label="价格" label-width="100px">
                         <el-input v-model="selectTable.price" auto-complete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="图片" label-width="100px">
+                      <el-upload
+                        class="avatar-uploader"
+                        :action="baseUrl + '/uploadFile'"
+                        :show-file-list="false"
+                        :on-success="handleAvatarSuccess"
+                        :before-upload="beforeAvatarUpload">
+                        <img v-if="file" :src="baseImgPath+'/'+selectTable.cover" class="avatar">
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                      </el-upload>
+
                     </el-form-item>
                 </el-form>
               <div slot="footer" class="dialog-footer">
@@ -148,7 +184,7 @@
                 selectTable: {},
                 editDialogFormVisible: false,
                 addDialogFormVisible:false,
-
+                file:'',
         				categoryList: [],
         				selectedCategory: '',
 
@@ -187,6 +223,7 @@
                       tableData.price = item.price;
                       tableData.category = item.category;
                       tableData.tagList = item.tagList;
+                      tableData.cover = item.cover;
                       this.tableData.push(tableData);
                   })
                 }else{
@@ -236,6 +273,10 @@
             handleEdit(index, row) {
                 this.selectTable = row;
                 this.selectedCategory = row.category.id;
+                this.selectedTagList = [];
+                row.tagList.forEach(item => {
+                    this.selectedTagList.push(item.id);
+                })
                 this.editDialogFormVisible = true;
             },
             handleAdd(){
@@ -265,6 +306,17 @@
             async update(){
                 this.editDialogFormVisible = false;
                 try{
+                  //接收选中的分类，单选
+                  this.selectTable.category = {id:this.selectedCategory}
+                  //接收选中的tag，多选
+                  this.selectTable.tagList = [];
+                  this.selectedTagList.forEach(item => {
+                      const tagObj = {};
+                      tagObj.id = item.id;
+                      this.selectTable.tagList.push(tagObj);
+                  })
+                  this.selectTable.tagList = this.selectedTagList;
+                  //post
                     const res = await updateDish(this.selectTable)
                     if (res.code == 200) {
                         this.$message({
@@ -313,6 +365,24 @@
                     console.log('新增失败', err);
                 }
             },
+            handleAvatarSuccess(res, file) {
+              console.log("handleAvatarSuccess 1 ");
+              this.selectTable.cover = res.data;
+              console.log("res.code :"+res.code);
+              this.file = URL.createObjectURL(file.raw);
+            },
+            beforeAvatarUpload(file) {
+              const isRightType = (file.type === 'image/jpeg') || (file.type === 'image/png');
+              const isLt2M = file.size / 1024 / 1024 < 2;
+
+              if (!isRightType) {
+                this.$message.error('上传头像图片只能是 JPG|PNG 格式!');
+              }
+              if (!isLt2M) {
+                this.$message.error('上传头像图片大小不能超过 2MB!');
+              }
+              return isRightType && isLt2M;
+            }
         },
     }
 </script>

@@ -30,6 +30,10 @@
                   label="名称"
                   prop="name">
                 </el-table-column>
+                <el-table-column
+                  label="状态"
+                  prop="status">
+                </el-table-column>
                 <el-table-column label="操作" width="200">
                   <template scope="scope">
                     <el-button
@@ -123,6 +127,7 @@
                       tableData.id = item.id;
                       tableData.name = item.name;
                       tableData.description = item.description;
+                      tableData.status = item.status;
                       this.tableData.push(tableData);
                   })
                 }else{
