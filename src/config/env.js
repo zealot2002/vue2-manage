@@ -6,9 +6,9 @@
  * baseImgPath: 图片存放地址
  *
  */
-let baseUrl = 'http://localhost:8004';
+let baseUrl = 'http://172.30.14.202:8030/shop';
 let routerMode = 'history';
-let baseImgPath = 'http://localhost:8004/files';
+let baseImgPath = 'http://localhost:8002/files';
 
 // if (process.env.NODE_ENV == 'development') {
 // 	//baseUrl = 'http://cangdu.org:8001';

@@ -59,7 +59,6 @@
                     <el-form-item label="名称" label-width="100px">
                         <el-input v-model="selectTable.name" auto-complete="off"></el-input>
                     </el-form-item>
-
                 </el-form>
               <div slot="footer" class="dialog-footer">
                 <el-button @click="editDialogFormVisible = false">取 消</el-button>
@@ -113,12 +112,12 @@
             },
             async getList(){
               try{
-                const res = await getCategoryList({pageNumber: this.pageNum, pageSize: this.pageSize});
+                const res = await getCategoryList({pageNum: this.pageNum, pageSize: this.pageSize});
                 this.tableData = [];
                 if(res.code == 200){
                   console.log("200");
                   this.count = res.data.totalElements;
-                  res.data.content.forEach(item => {
+                  res.data.forEach(item => {
                       const tableData = {};
                       tableData.id = item.id;
                       tableData.name = item.name;

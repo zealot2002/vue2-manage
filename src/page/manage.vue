@@ -6,11 +6,11 @@
 					<el-menu-item index="manage"><i class="el-icon-menu"></i>首页</el-menu-item>
 					<el-submenu index="2">
 						<template slot="title"><i class="el-icon-document"></i>数据管理</template>
-						<el-menu-item index="deskList">桌台列表</el-menu-item>
+						<el-menu-item index="userList">用户列表</el-menu-item>
 						<el-menu-item index="categoryList">分类列表</el-menu-item>
 						<el-menu-item index="tagList">标签列表</el-menu-item>
-						<el-menu-item index="dishList">菜品列表</el-menu-item>
-						<el-menu-item index="entList">订单列表</el-menu-item>
+						<el-menu-item index="goodsList">商品列表</el-menu-item>
+						<el-menu-item index="orderList">订单列表</el-menu-item>
 					</el-submenu>
 					<el-submenu index="3">
 						<template slot="title"><i class="el-icon-warning"></i>说明</template>

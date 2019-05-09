@@ -148,6 +148,7 @@
             },
             handleEdit(index, row) {
                 this.selectTable = row;
+                console.log(`handleEdit  ${this.selectTable.id} `);
                 this.editDialogFormVisible = true;
             },
             handleAdd(){

@@ -253,7 +253,7 @@ export const deleteDesk = data => fetch('/desk/delete', data,'POST');
  * 分类
  */
 
-export const getCategoryList = data => fetch('/category/list', data,'POST');
+export const getCategoryList = data => fetch('/category/queryPage', data,'POST');
 export const addCategory = data => fetch('/category/add', data,'POST');
 export const updateCategory = data => fetch('/category/update', data,'POST');
 export const deleteCategory = data => fetch('/category/delete', data,'POST');

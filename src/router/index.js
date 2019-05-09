@@ -8,7 +8,7 @@ const manage = r => require.ensure([], () => r(require('@/page/manage')), 'manag
 const home = r => require.ensure([], () => r(require('@/page/home')), 'home');
 const addShop = r => require.ensure([], () => r(require('@/page/addShop')), 'addShop');
 const addCommodity = r => require.ensure([], () => r(require('@/page/addCommodity')), 'addCommodity');
-const orderList = r => require.ensure([], () => r(require('@/page/orderList')), 'orderList');
+// const orderList = r => require.ensure([], () => r(require('@/page/orderList')), 'orderList');
 const adminList = r => require.ensure([], () => r(require('@/page/adminList')), 'adminList');
 const visitor = r => require.ensure([], () => r(require('@/page/visitor')), 'visitor');
 const newMember = r => require.ensure([], () => r(require('@/page/newMember')), 'newMember');
@@ -19,11 +19,11 @@ const sendMessage = r => require.ensure([], () => r(require('@/page/sendMessage'
 const explain = r => require.ensure([], () => r(require('@/page/explain')), 'explain');
 
 
-const deskList = r => require.ensure([], () => r(require('@/page/deskList')), 'deskList');
+const userList = r => require.ensure([], () => r(require('@/page/userList')), 'userList');
 const categoryList = r => require.ensure([], () => r(require('@/page/categoryList')), 'categoryList');
 const tagList = r => require.ensure([], () => r(require('@/page/tagList')), 'tagList');
-const dishList = r => require.ensure([], () => r(require('@/page/dishList')), 'dishList');
-const entList = r => require.ensure([], () => r(require('@/page/entList')), 'entList');
+const goodsList = r => require.ensure([], () => r(require('@/page/goodsList')), 'goodsList');
+const orderList = r => require.ensure([], () => r(require('@/page/orderList')), 'orderList');
 
 
 const routes = [
@@ -40,9 +40,9 @@ const routes = [
 			component: home,
 			meta: [],
 		},{
-			path: '/deskList',
-			component: deskList,
-			meta: ['数据管理', '桌台'],
+			path: '/userList',
+			component: userList,
+			meta: ['数据管理', '用户'],
 		},{
 			path: '/categoryList',
 			component: categoryList,
@@ -52,12 +52,12 @@ const routes = [
 			component: tagList,
 			meta: ['数据管理', '标签'],
 		},{
-			path: '/dishList',
-			component: dishList,
-			meta: ['数据管理', '菜品'],
+			path: '/goodsList',
+			component: goodsList,
+			meta: ['数据管理', '商品'],
 		},{
-			path: '/entList',
-			component: entList,
+			path: '/ orderList',
+			component: orderList,
 			meta: ['数据管理', '订单'],
 		},{
 			path: '/explain',
