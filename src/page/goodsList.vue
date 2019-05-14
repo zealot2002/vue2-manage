@@ -6,7 +6,7 @@
             size="mini"
             type="info"
             style="float:right"
-            @click="handleAdd()">增加菜品</el-button>
+            @click="handleAdd()">增加商品</el-button>
             <br/><br/>
             <el-table
                 :data="tableData"
@@ -24,11 +24,16 @@
                         <span>{{ props.row.price }}</span>
                       </el-form-item>
                       <el-form-item label="分类">
-                        <span>{{ props.row.category.name }}</span>
+                        <span>{{ props.row.categoryName }}</span>
                       </el-form-item>
                       <el-form-item label="标签">
                         <span v-for="tag of props.row.tagList">
                           {{ tag.name }}
+                        </span>
+                      </el-form-item>
+                      <el-form-item label="图片">
+                        <span v-for="imageUrl of props.row.imageUrlList">
+                            <img :src="imageUrl" class="image">
                         </span>
                       </el-form-item>
                     </el-form>
@@ -40,7 +45,7 @@
                 </el-table-column>
                 <el-table-column
                   label="分类"
-                  prop="category.name">
+                  prop="categoryName">
                 </el-table-column>
                 <el-table-column
                   label="价格"
@@ -50,12 +55,12 @@
                   <template scope="scope">
                     <el-button
                       size="mini"
-                      @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                      @click="handleEdit(scope.$column, scope.row)">编辑</el-button>
 
                     <el-button
                       size="mini"
                       type="danger"
-                      @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                      @click="handleDelete(scope.$column, scope.row)">删除</el-button>
                   </template>
                 </el-table-column>
             </el-table>
@@ -72,7 +77,7 @@
             <el-dialog title="修改信息" v-model="editDialogFormVisible">
                 <el-form :model="selectTable">
                   <el-form-item label="类别" label-width="100px">
-                    <el-select v-model="selectedCategory" :placeholder="selectValue.label" style="width:100%;">
+                    <el-select v-model="selectedCategoryId" :placeholder="selectValue.label" style="width:100%;">
                       <el-option
                           v-for="item in categoryList"
                           :key="item.id"
@@ -99,28 +104,16 @@
                     <el-form-item label="价格" label-width="100px">
                         <el-input v-model="selectTable.price" auto-complete="off"></el-input>
                     </el-form-item>
-
-                    <el-form-item label="图片" label-width="100px">
-                      <el-upload
-                        class="avatar-uploader"
-                        :action="baseUrl + '/uploadFile'"
-                        :show-file-list="false"
-                        :on-success="handleAvatarSuccess"
-                        :before-upload="beforeAvatarUpload">
-                        <img v-if="file" :src="baseImgPath+'/'+selectTable.cover" class="avatar">
-                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                      </el-upload>
-                    </el-form-item>
                 </el-form>
               <div slot="footer" class="dialog-footer">
                 <el-button @click="editDialogFormVisible = false">取 消</el-button>
                 <el-button type="primary" @click="update">确 定</el-button>
               </div>
             </el-dialog>
-            <el-dialog title="增加菜品" v-model="addDialogFormVisible">
+            <el-dialog title="增加商品" v-model="addDialogFormVisible">
                 <el-form :model="selectTable">
                     <el-form-item label="类别" label-width="100px">
-                      <el-select v-model="selectedCategory" :placeholder="selectValue.label" style="width:100%;">
+                      <el-select v-model="selectedCategoryId" :placeholder="selectValue.label" style="width:100%;">
                         <el-option
                             v-for="item in categoryList"
                             :key="item.id"
@@ -146,15 +139,7 @@
                         <el-input v-model="selectTable.price" auto-complete="off"></el-input>
                     </el-form-item>
                     <el-form-item label="图片" label-width="100px">
-                      <el-upload
-                        class="avatar-uploader"
-                        :action="baseUrl + '/uploadFile'"
-                        :show-file-list="false"
-                        :on-success="handleAvatarSuccess"
-                        :before-upload="beforeAvatarUpload">
-                        <img v-if="file" :src="baseImgPath+'/'+selectTable.cover" class="avatar">
-                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                      </el-upload>
+
 
                     </el-form-item>
                 </el-form>
@@ -170,7 +155,7 @@
 <script>
     import headTop from '../components/headTop'
     import {baseUrl, baseImgPath} from '@/config/env'
-    import {getDishList,addDish,updateDish, deleteDish,getCategoryList,getTagList} from '@/api/getData'
+    import {getGoodsList,addGoods,updateGoods, deleteGoods,getCategoryList,getTagList} from '@/api/getData'
     export default {
         data(){
             return {
@@ -186,10 +171,10 @@
                 addDialogFormVisible:false,
                 file:'',
         				categoryList: [],
-        				selectedCategory: '',
-
+        				selectedCategoryId: 0,
                 tagList: [],
                 selectedTagList: [],
+                tagIdList:[],
             }
         },
         created(){
@@ -200,7 +185,7 @@
     	},
       computed: {
     		selectValue: function (){
-    			return this.categoryList[this.selectedCategory]||{}
+    			return {}
     		}
     	},
         methods: {
@@ -211,18 +196,21 @@
             },
             async getList(){
               try{
-                const res = await getDishList({pageNumber: this.pageNum, pageSize: this.pageSize});
+                const res = await getGoodsList({pageNum: this.pageNum, pageSize: this.pageSize});
                 this.tableData = [];
                 if(res.code == 200){
                   console.log("200");
                   this.count = res.data.totalElements;
-                  res.data.content.forEach(item => {
+                  res.data.forEach(item => {
                       const tableData = {};
                       tableData.id = item.id;
                       tableData.name = item.name;
+                      tableData.desciption = item.desciption;
                       tableData.price = item.price;
-                      tableData.category = item.category;
+                      tableData.categoryId = item.categoryId;
+                      tableData.categoryName = item.categoryName;
                       tableData.tagList = item.tagList;
+                      tableData.imageUrlList = item.imageUrlList;
                       tableData.cover = item.cover;
                       this.tableData.push(tableData);
                   })
@@ -235,11 +223,11 @@
             },
             async getAllCategory(){
               try{
-                const res = await getCategoryList({pageNumber: 1, pageSize: 1000});
+                const res = await getCategoryList({pageNum: 1, pageSize: 1000});
                 this.categoryList = [];
                 if(res.code == 200){
                   console.log("getAllCategory 200");
-                  this.categoryList = res.data.content;
+                  this.categoryList = res.data;
                 }else{
                   console.log("获取失败");
                 }
@@ -249,11 +237,11 @@
             },
             async getAllTag(){
               try{
-                const res = await getTagList({pageNumber: 1, pageSize: 1000});
+                const res = await getTagList({pageNum: 1, pageSize: 1000});
                 this.tagList = [];
                 if(res.code == 200){
                   console.log("getAllTag 200");
-                  this.tagList = res.data.content;
+                  this.tagList = res.data;
                 }else{
                   console.log("获取失败");
                 }
@@ -272,7 +260,7 @@
             },
             handleEdit(index, row) {
                 this.selectTable = row;
-                this.selectedCategory = row.category.id;
+                this.selectedCategoryId = row.categoryId;
                 this.selectedTagList = [];
                 row.tagList.forEach(item => {
                     this.selectedTagList.push(item.id);
@@ -285,7 +273,7 @@
             },
             async handleDelete(index, row) {
                 try{
-                    const res = await deleteDish(row.id);
+                    const res = await deleteGoods(row.id);
                     if (res.code == 200) {
                         this.$message({
                             type: 'success',
@@ -306,18 +294,11 @@
             async update(){
                 this.editDialogFormVisible = false;
                 try{
-                  //接收选中的分类，单选
-                  this.selectTable.category = {id:this.selectedCategory}
+                  this.selectTable.categoryId = this.selectedCategoryId;
                   //接收选中的tag，多选
-                  this.selectTable.tagList = [];
-                  this.selectedTagList.forEach(item => {
-                      const tagObj = {};
-                      tagObj.id = item.id;
-                      this.selectTable.tagList.push(tagObj);
-                  })
-                  this.selectTable.tagList = this.selectedTagList;
+                  this.selectTable.tagIdList = this.selectedTagList;
                   //post
-                    const res = await updateDish(this.selectTable)
+                    const res = await updateGoods(this.selectTable)
                     if (res.code == 200) {
                         this.$message({
                             type: 'success',
@@ -338,17 +319,11 @@
                 this.addDialogFormVisible = false;
                 try{
                     //接收选中的分类，单选
-                    this.selectTable.category = {id:this.selectedCategory}
+                    this.selectTable.categoryId = this.selectedCategoryId;
                     //接收选中的tag，多选
-                    this.selectTable.tagList = [];
-                    this.selectedTagList.forEach(item => {
-                        const tagObj = {};
-                        tagObj.id = item.id;
-                        this.selectTable.tagList.push(tagObj);
-                    })
-                    this.selectTable.tagList = this.selectedTagList;
+                    this.selectTable.tagIdList = this.selectedTagList;
                     //post
-                    const res = await addDish(this.selectTable)
+                    const res = await addGoods(this.selectTable)
                     if (res.code == 200) {
                         this.$message({
                             type: 'success',

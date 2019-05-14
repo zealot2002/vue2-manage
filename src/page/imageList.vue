@@ -2,53 +2,43 @@
     <div class="fillcontain">
         <head-top></head-top>
         <div class="table_container">
+          <el-button
+            size="mini"
+            type="info"
+            style="float:right"
+            @click="handleAdd()">增加图片</el-button>
+            <br/><br/>
             <el-table
                 :data="tableData"
                 style="width: 100%">
                 <el-table-column type="expand">
                   <template scope="props">
                     <el-form label-position="left" inline class="demo-table-expand">
-                      <el-form-item label="菜品列表">
-                        <li v-for="dish of props.row.dishList">
-                          {{ dish.name }}   {{ dish.price }}  
-                        </li>
+                      <el-form-item label="缩略图">
+                        <img :src="props.row.url" class="image">
                       </el-form-item>
-
-                      <el-form-item
-                        label="处理时间"
-                        prop="startTime">
-                      </el-form-item>
-                      <el-form-item
-                        label="完成时间"
-                        prop="endTime">
-                      </el-form-item>
-                      <el-form-item
-                        label="支付时间"
-                        prop="chargedTime">
-                      </el-form-item>
-
                     </el-form>
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="编号"
+                  label="ID"
                   prop="id">
                 </el-table-column>
                 <el-table-column
-                  label="桌台"
-                  prop="desk">
+                  label="路径"
+                  prop="url">
                 </el-table-column>
-                <el-table-column
-                  label="下单时间"
-                  prop="createTime">
-                </el-table-column>
-                <el-table-column
-                  label="价格"
-                  prop="price">
-                </el-table-column>
-                <el-table-column
-                  label="状态"
-                  prop="status">
+                <el-table-column label="操作" width="200">
+                  <template scope="scope">
+                    <el-button
+                      size="mini"
+                      @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+
+                    <el-button
+                      size="mini"
+                      type="danger"
+                      @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                  </template>
                 </el-table-column>
             </el-table>
             <div class="Pagination">
@@ -63,11 +53,8 @@
             </div>
             <el-dialog title="修改信息" v-model="editDialogFormVisible">
                 <el-form :model="selectTable">
-                    <el-form-item label="名称" label-width="100px">
-                        <el-input v-model="selectTable.name" auto-complete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="描述" label-width="100px">
-                        <el-input v-model="selectTable.description" auto-complete="off"></el-input>
+                    <el-form-item label="路径" label-width="100px">
+                        <el-input v-model="selectTable.url" auto-complete="off"></el-input>
                     </el-form-item>
                 </el-form>
               <div slot="footer" class="dialog-footer">
@@ -75,7 +62,18 @@
                 <el-button type="primary" @click="update">确 定</el-button>
               </div>
             </el-dialog>
+            <el-dialog title="增加图片" v-model="addDialogFormVisible">
+                <el-form :model="selectTable">
+                    <el-form-item label="路径" label-width="100px">
+                        <el-input v-model="selectTable.url" auto-complete="off"></el-input>
+                    </el-form-item>
+                </el-form>
 
+              <div slot="footer" class="dialog-footer">
+                <el-button @click="addDialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="add">确 定</el-button>
+              </div>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -83,20 +81,21 @@
 <script>
     import headTop from '../components/headTop'
     import {baseUrl, baseImgPath} from '@/config/env'
-    import {getEntList,addEnt,updateEnt, deleteEnt} from '@/api/getData'
+    import {getImageList,addImage,updateImage, deleteImage} from '@/api/getData'
     export default {
         data(){
             return {
                 baseUrl,
                 baseImgPath,
                 pageNum: 1,
-                pageSize: 15,
+                pageSize: 10,
                 count: 0,
                 tableData: [],
                 currentPage: 1,
                 selectTable: {},
                 editDialogFormVisible: false,
                 addDialogFormVisible:false,
+                address: {},
             }
         },
         created(){
@@ -106,38 +105,20 @@
     		headTop,
     	},
         methods: {
-            toLocaleString(timestamp){
-                var newDate = new Date();
-                newDate.setTime(timestamp);
-                return newDate.toLocaleString();
-            },
             async initData(){
                 this.getList();
             },
             async getList(){
               try{
-                const res = await getEntList({pageNumber: this.pageNum, pageSize: this.pageSize});
+                const res = await getImageList({pageNum: this.pageNum, pageSize: this.pageSize});
                 this.tableData = [];
                 if(res.code == 200){
                   console.log("200");
                   this.count = res.data.totalElements;
-                  res.data.content.forEach(item => {
+                  res.data.forEach(item => {
                       const tableData = {};
                       tableData.id = item.id;
-                      tableData.desk = item.desk.name;
-                      tableData.status = item.status;
-                      tableData.dishList = item.dishList;
-                      tableData.price = item.price;
-
-                      if(item.createTime>0)
-                        tableData.createTime = this.toLocaleString(item.createTime);
-                      if(item.startTime>0)
-                        tableData.startTime = this.toLocaleString(item.startTime);
-                      if(item.endTime>0)
-                        tableData.endTime = this.toLocaleString(item.endTime);
-                      if(item.chargedTime>0)
-                        tableData.chargedTime = this.toLocaleString(item.chargedTime);
-
+                      tableData.url = item.url;
                       this.tableData.push(tableData);
                   })
                 }else{
@@ -166,7 +147,7 @@
             },
             async handleDelete(index, row) {
                 try{
-                    const res = await deleteEnt(row.id);
+                    const res = await deleteImage(row.id);
                     if (res.code == 200) {
                         this.$message({
                             type: 'success',
@@ -187,7 +168,7 @@
             async update(){
                 this.editDialogFormVisible = false;
                 try{
-                    const res = await updateEnt(this.selectTable)
+                    const res = await updateImage(this.selectTable)
                     if (res.code == 200) {
                         this.$message({
                             type: 'success',
@@ -207,7 +188,7 @@
             async add(){
                 this.addDialogFormVisible = false;
                 try{
-                    const res = await addEnt(this.selectTable)
+                    const res = await addImage(this.selectTable)
                     if (res.code == 200) {
                         this.$message({
                             type: 'success',

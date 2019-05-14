@@ -86,7 +86,7 @@
                 baseUrl,
                 baseImgPath,
                 pageNum: 1,
-                pageSize: 15,
+                pageSize: 10,
                 count: 0,
                 tableData: [],
                 currentPage: 1,
@@ -108,12 +108,12 @@
             },
             async getList(){
               try{
-                const res = await getTagList({pageNumber: this.pageNum, pageSize: this.pageSize});
+                const res = await getTagList({pageNum: this.pageNum, pageSize: this.pageSize});
                 this.tableData = [];
                 if(res.code == 200){
                   console.log("200");
                   this.count = res.data.totalElements;
-                  res.data.content.forEach(item => {
+                  res.data.forEach(item => {
                       const tableData = {};
                       tableData.id = item.id;
                       tableData.name = item.name;

@@ -14,11 +14,8 @@
                 <el-table-column type="expand">
                   <template scope="props">
                     <el-form label-position="left" inline class="demo-table-expand">
-                      <el-form-item label="ID">
-                        <span>{{ props.row.id }}</span>
-                      </el-form-item>
-                      <el-form-item label="名称">
-                        <span>{{ props.row.name }}</span>
+                      <el-form-item label="缩略图">
+                        <img :src="props.row.imageUrl" class="image">
                       </el-form-item>
                     </el-form>
                   </template>
@@ -30,6 +27,10 @@
                 <el-table-column
                   label="名称"
                   prop="name">
+                </el-table-column>
+                <el-table-column
+                  label="icon"
+                  prop="imageUrl">
                 </el-table-column>
                 <el-table-column label="操作" width="200">
                   <template scope="scope">
@@ -59,6 +60,9 @@
                     <el-form-item label="名称" label-width="100px">
                         <el-input v-model="selectTable.name" auto-complete="off"></el-input>
                     </el-form-item>
+                    <el-form-item label="图片id" label-width="100px">
+                        <el-input v-model="selectTable.imageId" auto-complete="off"></el-input>
+                    </el-form-item>
                 </el-form>
               <div slot="footer" class="dialog-footer">
                 <el-button @click="editDialogFormVisible = false">取 消</el-button>
@@ -69,6 +73,9 @@
                 <el-form :model="selectTable">
                     <el-form-item label="名称" label-width="100px">
                         <el-input v-model="selectTable.name" auto-complete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="图片id" label-width="100px">
+                        <el-input v-model="selectTable.imageId" auto-complete="off"></el-input>
                     </el-form-item>
                 </el-form>
               <div slot="footer" class="dialog-footer">
@@ -121,6 +128,7 @@
                       const tableData = {};
                       tableData.id = item.id;
                       tableData.name = item.name;
+                      tableData.imageUrl = item.imageUrl;
                       this.tableData.push(tableData);
                   })
                 }else{

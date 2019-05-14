@@ -1,29 +1,6 @@
 import fetch from '@/config/fetch'
 
-/**
- * 登陆
- */
 
-export const login = data => fetch('/admin/login', data, 'POST');
-
-/**
- * 获取upload token
- */
-
-export const getUploadToken = data => fetch('/base/getUploadToken', data, 'POST');
-
-
-/**
- * 退出
- */
-
-export const signout = () => fetch('/admin/singout');
-
-/**
- * 获取用户信息
- */
-
-export const getAdminInfo = () => fetch('/admin/info');
 
 /**
  * api请求量
@@ -84,12 +61,6 @@ export const cityGuess = () => fetch('/v1/cities', {
 });
 
 /**
- * 添加商铺
- */
-
-export const addShop = data => fetch('/shop/add', data, 'POST');
-
-/**
  * 获取搜索地址
  */
 
@@ -99,11 +70,7 @@ export const searchplace = (cityid, value) => fetch('/v1/pois', {
 	keyword: value
 });
 
-/**
- * 获取当前店铺食品种类
- */
 
-export const getCategory = restaurant_id => fetch('/shopping/getcategory/' + restaurant_id);
 
 /**
  * 添加食品种类
@@ -147,17 +114,7 @@ export const getResturantDetail = restaurant_id => fetch('/shopping/restaurant/'
 
 export const getShopCount = () => fetch('/shop/count');
 
-/**
- * 更新餐馆信息
- */
 
-export const updateShop = data => fetch('/shop/update', data, 'POST');
-
-/**
- * 删除餐馆
- */
-
-export const deleteShop = shop_id => fetch('/shop/delete/',shop_id, 'POST');
 
 /**
  * 获取食品列表
@@ -196,11 +153,6 @@ export const updateFood = data => fetch('/shopping/v2/updatefood', data, 'POST')
 
 export const deleteFood = food_id => fetch('/shopping/v2/food/' + food_id, {}, 'DELETE');
 
-/**
- * 获取用户列表
- */
-
-export const getUserList = data => fetch('/v1/users/list', data);
 
 /**
  * 获取用户数量
@@ -208,11 +160,7 @@ export const getUserList = data => fetch('/v1/users/list', data);
 
 export const getUserCount = data => fetch('/v1/users/count', data);
 
-/**
- * 获取订单列表
- */
 
-export const getOrderList = data => fetch('/bos/orders', data);
 
 /**
  * 获取订单数量
@@ -238,9 +186,6 @@ export const getAddressById = address_id => fetch('/v1/addresse/' + address_id);
 
 export const getUserCity = () => fetch('/v1/user/city/count');
 
-
-
-/***********************************************************************************/
 /**
  * 桌台
  */
@@ -248,24 +193,6 @@ export const getDeskList = data => fetch('/desk/list', data,'POST');
 export const addDesk = data => fetch('/desk/add', data,'POST');
 export const updateDesk = data => fetch('/desk/update', data,'POST');
 export const deleteDesk = data => fetch('/desk/delete', data,'POST');
-
-/**
- * 分类
- */
-
-export const getCategoryList = data => fetch('/category/queryPage', data,'POST');
-export const addCategory = data => fetch('/category/add', data,'POST');
-export const updateCategory = data => fetch('/category/update', data,'POST');
-export const deleteCategory = data => fetch('/category/delete', data,'POST');
-
-/**
- * 标签
- */
-
-export const getTagList = data => fetch('/tag/list', data,'POST');
-export const addTag = data => fetch('/tag/add', data,'POST');
-export const updateTag = data => fetch('/tag/update', data,'POST');
-export const deleteTag = data => fetch('/tag/delete', data,'POST');
 
 /**
  * 菜品
@@ -276,11 +203,70 @@ export const addDish = data => fetch('/dish/add', data,'POST');
 export const updateDish = data => fetch('/dish/update', data,'POST');
 export const deleteDish = data => fetch('/dish/delete', data,'POST');
 
+/***********************************************************************************/
+
+/**
+ * 登陆
+ */
+
+export const login = data => fetch('/admin/login', data, 'POST');
+
+/**
+ * 店铺
+ */
+
+export const getShopList = data => fetch('/shop/queryPage', data,'POST');
+export const addShop = data => fetch('/shop/add', data,'POST');
+export const updateShop = data => fetch('/shop/update', data,'POST');
+export const deleteShop = data => fetch('/shop/delete', data,'POST');
+
+/**
+ * 分类
+ */
+export const getAllCategoryList = data => fetch('/category/queryAll', data,'POST');
+export const getCategoryList = data => fetch('/category/queryPage', data,'POST');
+export const addCategory = data => fetch('/category/add', data,'POST');
+export const updateCategory = data => fetch('/category/update', data,'POST');
+export const deleteCategory = data => fetch('/category/delete', data,'POST');
+
+/**
+ * 标签
+ */
+
+export const getAllTagList = data => fetch('/tag/queryAll', data,'POST');
+export const getTagList = data => fetch('/tag/queryPage', data,'POST');
+export const addTag = data => fetch('/tag/add', data,'POST');
+export const updateTag = data => fetch('/tag/update', data,'POST');
+export const deleteTag = data => fetch('/tag/delete', data,'POST');
+
+/**
+ * goods
+ */
+
+export const getGoodsList = data => fetch('/goods/queryPage', data,'POST');
+export const addGoods = data => fetch('/goods/add', data,'POST');
+export const updateGoods = data => fetch('/goods/update', data,'POST');
+export const deleteGoods = data => fetch('/goods/delete', data,'POST');
+
+/**
+ * user
+ */
+
+export const getUserList = data => fetch('/user/queryPage', data,'POST');
+export const updateUser = data => fetch('/user/update', data,'POST');
+export const deleteUser = data => fetch('/user/delete', data,'POST');
 /**
  * 订单
  */
 
-export const getEntList = data => fetch('/ent/list', data,'POST');
-export const addEnt = data => fetch('/ent/add', data,'POST');
-export const updateEnt = data => fetch('/ent/update', data,'POST');
-export const deleteEnt = data => fetch('/ent/delete', data,'POST');
+export const getOrderList = data => fetch('/order/queryPage', data,'POST');
+export const updateOrder = data => fetch('/order/update', data,'POST');
+export const deleteOrder = data => fetch('/order/delete', data,'POST');
+/**
+ * image
+ */
+
+export const getImageList = data => fetch('/image/queryPage', data,'POST');
+export const addImage = data => fetch('/image/add', data,'POST');
+export const updateImage = data => fetch('/image/update', data,'POST');
+export const deleteImage = data => fetch('/image/delete', data,'POST');

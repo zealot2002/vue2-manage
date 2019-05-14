@@ -2,157 +2,220 @@
     <div class="fillcontain">
         <head-top></head-top>
         <div class="table_container">
+            <br/><br/>
             <el-table
-			    :data="tableData"
-			    @expand='expand'
-                :expand-row-keys='expendRow'
-                :row-key="row => row.index"
-			    style="width: 100%">
-			    <el-table-column type="expand">
-			      <template scope="props">
-			        <el-form label-position="left" inline class="demo-table-expand">
-			          <el-form-item label="用户名" >
-			            <span>{{ props.row.user_name }}</span>
-			          </el-form-item>
-			          <el-form-item label="店铺名称">
-			            <span>{{ props.row.restaurant_name }}</span>
-			          </el-form-item>
-			          <el-form-item label="收货地址">
-			            <span>{{ props.row.address }}</span>
-			          </el-form-item>
-			          <el-form-item label="店铺 ID">
-			            <span>{{ props.row.restaurant_id }}</span>
-			          </el-form-item>
-			          <el-form-item label="店铺地址">
-			            <span>{{ props.row.restaurant_address }}</span>
-			          </el-form-item>
-			        </el-form>
-			      </template>
-			    </el-table-column>
-			    <el-table-column
-			      label="订单 ID"
-			      prop="id">
-			    </el-table-column>
-			    <el-table-column
-			      label="总价格"
-			      prop="total_amount">
-			    </el-table-column>
-			    <el-table-column
-			      label="订单状态"
-			      prop="status">
-			    </el-table-column>
-			</el-table>
-            <div class="Pagination" style="text-align: left;margin-top: 10px;">
+                :data="tableData"
+                style="width: 100%">
+                <el-table-column type="expand">
+                  <template scope="props">
+                    <el-form label-position="left" inline class="demo-table-expand">
+                      <el-form-item label="ID">
+                        <span>{{ props.row.id }}</span>
+                      </el-form-item>
+                      <el-form-item label="编号">
+                        <span>{{ props.row.code }}</span>
+                      </el-form-item>
+                      <el-form-item label="下单时间">
+                        <span>{{ props.row.createdTime }}</span>
+                      </el-form-item>
+                      <el-form-item label="电话">
+                        <span>{{ props.row.phone }}</span>
+                      </el-form-item>
+                      <el-form-item label="地址">
+                        <span>{{ props.row.address }}</span>
+                      </el-form-item>
+                      <el-form-item label="备注">
+                        <span>{{ props.row.remarks }}</span>
+                      </el-form-item>
+                    </el-form>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  label="编号"
+                  prop="code">
+                </el-table-column>
+                <el-table-column
+                  label="下单时间"
+                  prop="createdTime">
+                </el-table-column>
+                <el-table-column
+                  label="电话"
+                  prop="phone">
+                </el-table-column>
+                <el-table-column
+                  label="状态"
+                  prop="state">
+                </el-table-column>
+                <el-table-column label="操作" width="200">
+                  <template scope="scope">
+                    <el-button
+                      size="mini"
+                      @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                  </template>
+                </el-table-column>
+            </el-table>
+            <div class="Pagination">
                 <el-pagination
                   @size-change="handleSizeChange"
                   @current-change="handleCurrentChange"
                   :current-page="currentPage"
-                  :page-size="20"
+                  :page-size="15"
                   layout="total, prev, pager, next"
                   :total="count">
                 </el-pagination>
             </div>
+            <el-dialog title="修改订单" v-model="editDialogFormVisible">
+                <el-form :model="selectTable">
+                    <el-form-item label="状态" label-width="100px">
+                        <el-input v-model="selectTable.state" auto-complete="off"></el-input>
+                    </el-form-item>
+                </el-form>
+              <div slot="footer" class="dialog-footer">
+                <el-button @click="editDialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="update">确 定</el-button>
+              </div>
+            </el-dialog>
         </div>
     </div>
 </template>
 
 <script>
     import headTop from '../components/headTop'
-    import {getOrderList, getOrderCount, getResturantDetail, getUserInfo, getAddressById} from '@/api/getData'
+    import {baseUrl, baseImgPath} from '@/config/env'
+    import {getOrderList,updateOrder} from '@/api/getData'
     export default {
         data(){
             return {
-                tableData: [],
-                currentRow: null,
-                offset: 0,
-                limit: 20,
+                baseUrl,
+                baseImgPath,
+                pageNum: 1,
+                pageSize: 10,
                 count: 0,
+                tableData: [],
                 currentPage: 1,
-                restaurant_id: null,
-                expendRow: [],
+                selectTable: {},
+                editDialogFormVisible: false,
+                addDialogFormVisible:false,
+                address: {},
             }
+        },
+        created(){
+            this.initData();
         },
     	components: {
     		headTop,
     	},
-        created(){
-        	this.restaurant_id = this.$route.query.restaurant_id;
-            this.initData();
-        },
-        mounted(){
-            
-        },
         methods: {
             async initData(){
-                try{
-                    const countData = await getOrderCount({restaurant_id: this.restaurant_id});
-                    if (countData.status == 1) {
-                        this.count = countData.count;
-                    }else{
-                        throw new Error('获取数据失败');
-                    }
-                    this.getOrders();
-                }catch(err){
-                    console.log('获取数据失败', err);
+                this.getList();
+            },
+            async getList(){
+              try{
+                const res = await getOrderList({pageNum: this.pageNum, pageSize: this.pageSize});
+                this.tableData = [];
+                if(res.code == 200){
+                  console.log("200");
+                  this.count = res.data.totalElements;
+                  res.data.forEach(item => {
+                      const tableData = {};
+                      tableData.id = item.id;
+                      tableData.userId = item.userId;
+                      tableData.code = item.code;
+                      tableData.phone = item.phone;
+                      tableData.address = item.address;
+                      tableData.remarks = item.remarks;
+                      tableData.totalPrice = item.totalPrice;
+                      tableData.createdTime = item.createdTime;
+                      this.tableData.push(tableData);
+                  })
+                }else{
+                  console.log("获取失败");
                 }
+              }catch(err){
+                  console.log('获取数据失败', err);
+              }
             },
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
             },
             handleCurrentChange(val) {
+                console.log(`handleCurrentChange  ${val} `);
                 this.currentPage = val;
-                this.offset = (val - 1)*this.limit;
-                this.getOrders()
+                this.pageNum = val;
+                this.getList()
             },
-            async getOrders(){
-                const Orders = await getOrderList({offset: this.offset, limit: this.limit, restaurant_id: this.restaurant_id});
-                this.tableData = [];
-                Orders.forEach((item, index) => {
-                    const tableData = {};
-                    tableData.id = item.id;
-                    tableData.total_amount = item.total_amount;
-                    tableData.status = item.status_bar.title;
-                    tableData.user_id = item.user_id;
- 					tableData.restaurant_id = item.restaurant_id;
- 					tableData.address_id = item.address_id;
-                    tableData.index = index;
-                    this.tableData.push(tableData);
-                })
+            handleEdit(index, row) {
+                this.selectTable = row;
+                this.editDialogFormVisible = true;
             },
-            async expand(row, status){
-            	if (status) {
-            		const restaurant = await getResturantDetail(row.restaurant_id);
-	            	const userInfo = await getUserInfo(row.user_id);
-	            	const addressInfo = await getAddressById(row.address_id);
-
-	                this.tableData.splice(row.index, 1, {...row, ...{restaurant_name: restaurant.name, restaurant_address: restaurant.address, address: addressInfo.address, user_name: userInfo.username}}); 
-                    this.$nextTick(() => {
-                        this.expendRow.push(row.index);
-                    })	
-	            }else{
-                    const index = this.expendRow.indexOf(row.index);
-                    this.expendRow.splice(index, 1)
+            async update(){
+                this.editDialogFormVisible = false;
+                try{
+                    const res = await updateOrder(this.selectTable)
+                    if (res.code == 200) {
+                        this.$message({
+                            type: 'success',
+                            message: '更新成功'
+                        });
+                        this.getList();
+                    }else{
+                        this.$message({
+                            type: 'error',
+                            message: res.message
+                        });
+                    }
+                }catch(err){
+                    console.log('更新失败', err);
                 }
             },
+
         },
     }
 </script>
 
 <style lang="less">
 	@import '../style/mixin';
+    .demo-table-expand {
+        font-size: 0;
+    }
+    .demo-table-expand label {
+        width: 90px;
+        color: #99a9bf;
+    }
+    .demo-table-expand .el-form-item {
+        margin-right: 0;
+        margin-bottom: 0;
+        width: 50%;
+    }
     .table_container{
         padding: 20px;
     }
-    .demo-table-expand {
-	    font-size: 0;
-	}
-	.demo-table-expand label {
-	    width: 90px;
-	    color: #99a9bf;
-	}
-	.demo-table-expand .el-form-item {
-	    margin-right: 0;
-	    margin-bottom: 0;
-	    width: 50%;
-	}
+    .Pagination{
+        display: flex;
+        justify-content: flex-start;
+        margin-top: 8px;
+    }
+    .avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #20a0ff;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 120px;
+        height: 120px;
+        line-height: 120px;
+        text-align: center;
+    }
+    .avatar {
+        width: 120px;
+        height: 120px;
+        display: block;
+    }
 </style>

@@ -6,7 +6,7 @@
             size="mini"
             type="info"
             style="float:right"
-            @click="handleAdd()">增加桌台</el-button>
+            @click="handleAdd()">增加店铺</el-button>
             <br/><br/>
             <el-table
                 :data="tableData"
@@ -20,6 +20,12 @@
                       <el-form-item label="名称">
                         <span>{{ props.row.name }}</span>
                       </el-form-item>
+                      <el-form-item label="电话">
+                        <span>{{ props.row.phone }}</span>
+                      </el-form-item>
+                      <el-form-item label="地址">
+                        <span>{{ props.row.address }}</span>
+                      </el-form-item>
                       <el-form-item label="描述">
                         <span>{{ props.row.description }}</span>
                       </el-form-item>
@@ -28,17 +34,23 @@
                 </el-table-column>
                 <el-table-column
                   label="名称"
-                  prop="name">
-                </el-table-column>
+                  prop="name"/>
                 <el-table-column
-                  label="状态"
-                  prop="status">
-                </el-table-column>
+                  label="电话"
+                  prop="phone"/>
+                <el-table-column
+                  label="地址"
+                  prop="address"/>
                 <el-table-column label="操作" width="200">
                   <template scope="scope">
                     <el-button
                       size="mini"
                       @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+
+                    <el-button
+                      size="mini"
+                      type="danger"
+                      @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                   </template>
                 </el-table-column>
             </el-table>
@@ -57,20 +69,38 @@
                     <el-form-item label="名称" label-width="100px">
                         <el-input v-model="selectTable.name" auto-complete="off"></el-input>
                     </el-form-item>
+
+                    <el-form-item label="地址" label-width="100px">
+                        <el-input v-model="selectTable.address" auto-complete="off"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="电话" label-width="100px">
+                        <el-input v-model="selectTable.phone" auto-complete="off"></el-input>
+                    </el-form-item>
+
                     <el-form-item label="描述" label-width="100px">
                         <el-input v-model="selectTable.description" auto-complete="off"></el-input>
                     </el-form-item>
+
                 </el-form>
               <div slot="footer" class="dialog-footer">
                 <el-button @click="editDialogFormVisible = false">取 消</el-button>
                 <el-button type="primary" @click="update">确 定</el-button>
               </div>
             </el-dialog>
-            <el-dialog title="增加桌台" v-model="addDialogFormVisible">
+            <el-dialog title="增加店铺" v-model="addDialogFormVisible">
                 <el-form :model="selectTable">
                     <el-form-item label="名称" label-width="100px">
                         <el-input v-model="selectTable.name" auto-complete="off"></el-input>
                     </el-form-item>
+                    <el-form-item label="地址" label-width="100px">
+                        <el-input v-model="selectTable.address" auto-complete="off"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="电话" label-width="100px">
+                        <el-input v-model="selectTable.phone" auto-complete="off"></el-input>
+                    </el-form-item>
+
                     <el-form-item label="描述" label-width="100px">
                         <el-input v-model="selectTable.description" auto-complete="off"></el-input>
                     </el-form-item>
@@ -87,16 +117,17 @@
 <script>
     import headTop from '../components/headTop'
     import {baseUrl, baseImgPath} from '@/config/env'
-    import {getDeskList,addDesk,updateDesk, deleteDesk} from '@/api/getData'
+    import {getShopList,addShop,updateShop, deleteShop} from '@/api/getData'
     export default {
         data(){
             return {
                 baseUrl,
                 baseImgPath,
                 pageNum: 1,
-                pageSize: 15,
+                pageSize: 10,
                 count: 0,
                 tableData: [],
+                imageIdList: [],
                 currentPage: 1,
                 selectTable: {},
                 editDialogFormVisible: false,
@@ -116,18 +147,18 @@
             },
             async getList(){
               try{
-                const res = await getDeskList({pageNumber: this.pageNum, pageSize: this.pageSize});
+                const res = await getShopList({pageNum: this.pageNum, pageSize: this.pageSize});
                 this.tableData = [];
                 if(res.code == 200){
                   console.log("200");
                   this.count = res.data.totalElements;
-                  console.log(this.count);
-                  res.data.content.forEach(item => {
+                  res.data.forEach(item => {
                       const tableData = {};
                       tableData.id = item.id;
                       tableData.name = item.name;
+                      tableData.address = item.address;
+                      tableData.phone = item.phone;
                       tableData.description = item.description;
-                      tableData.status = item.status;
                       this.tableData.push(tableData);
                   })
                 }else{
@@ -148,7 +179,6 @@
             },
             handleEdit(index, row) {
                 this.selectTable = row;
-                console.log(`handleEdit  ${this.selectTable.id} `);
                 this.editDialogFormVisible = true;
             },
             handleAdd(){
@@ -157,7 +187,7 @@
             },
             async handleDelete(index, row) {
                 try{
-                    const res = await deleteDesk(row.id);
+                    const res = await deleteShop(row.id);
                     if (res.code == 200) {
                         this.$message({
                             type: 'success',
@@ -178,7 +208,7 @@
             async update(){
                 this.editDialogFormVisible = false;
                 try{
-                    const res = await updateDesk(this.selectTable)
+                    const res = await updateShop(this.selectTable)
                     if (res.code == 200) {
                         this.$message({
                             type: 'success',
@@ -198,7 +228,7 @@
             async add(){
                 this.addDialogFormVisible = false;
                 try{
-                    const res = await addDesk(this.selectTable)
+                    const res = await addShop(this.selectTable)
                     if (res.code == 200) {
                         this.$message({
                             type: 'success',
